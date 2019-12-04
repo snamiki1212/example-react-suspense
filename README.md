@@ -1,0 +1,6 @@
+- React
+  - React.Suspense
+  - React ErrorBoundary
+- Library
+  - CacheLayer: [swr](https://github.com/zeit/swr#suspense-mode)
+  - FetchLayer: [unfetch](https://github.com/developit/unfetch)
