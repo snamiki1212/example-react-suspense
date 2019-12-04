@@ -7,19 +7,32 @@ const fetcher = url => fetch(url).then(r => r.json());
 
 const UserView: React.FC = () => {
   const { data } = useSWR("/api/user", fetcher, { suspense: true });
-  return <div>this-is-user: {data.name}</div>;
+  return <div>Fetched: user name is {data.name}</div>;
 };
 
 const UserViewLongLoading: React.FC = () => {
   const { data } = useSWR("/api/user?waitingSecond=2", fetcher, {
     suspense: true
   });
-  return <div>this-is-user: {data.name}</div>;
+  return <div>Fetched: user name is {data.name}</div>;
 };
 
-const Loading: React.FC = () => <span>loading...</span>;
+const UserViewCond: React.FC<{ shouldFetch: boolean }> = ({ shouldFetch }) => {
+  const { data } = useSWR(
+    shouldFetch ? "/api/user?waitingSecond=2" : null,
+    fetcher,
+    {
+      suspense: true
+    }
+  );
+  if (data == null) return null;
+  return <div>Fetched: user name is {data.name}</div>;
+};
+
+const Loading: React.FC = () => <span>...loading...</span>;
 
 const SWR: React.FC = () => {
+  const [viewable, setViewable] = React.useState<boolean>(false);
   return (
     <div>
       <ErrorBoundary>
@@ -32,10 +45,26 @@ const SWR: React.FC = () => {
         </div>
 
         {/*  */}
-        <h2>Long Fetching: waiting 2 second</h2>
-        <React.Suspense fallback={<Loading />}>
-          <UserViewLongLoading />
-        </React.Suspense>
+        <div>
+          <h2>Long Fetching: waiting 2 second</h2>
+          <React.Suspense fallback={<Loading />}>
+            <UserViewLongLoading />
+          </React.Suspense>
+        </div>
+
+        {/*  */}
+        <div>
+          <h2>toggle view</h2>
+          <button style={{border: '1px black solid' }}onClick={() => setViewable(prev => !prev)}>
+            click me after following long-fetching finish.
+          </button>
+          <p>
+            SWR cached data, so this button is clicked and view data imidiately.
+          </p>
+          <React.Suspense fallback={<Loading />}>
+            <UserViewCond shouldFetch={viewable} />
+          </React.Suspense>
+        </div>
       </ErrorBoundary>
     </div>
   );
