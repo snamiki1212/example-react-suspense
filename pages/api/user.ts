@@ -1,10 +1,14 @@
 export default (req, res) => {
-  const { waitingTime } = req.query
-  if(waitingTime == null) {
+  const { waitingSecond } = req.query
+
+  if(waitingSecond == null) {
     res.end(JSON.stringify({id: 1, name: 'sato'}))
     return
   }
-  
-  console.log('waiting')
-  res.end(JSON.stringify({id: 1, name: 'sato'}))
+
+  const _waitingSecond = Number(waitingSecond)
+  const sleep = async (second: number) => new Promise(resolve => setTimeout(resolve, second * 1000))
+  sleep(_waitingSecond).then(() => {
+    res.end(JSON.stringify({id: 1, name: 'sato'}))
+  })
 }
